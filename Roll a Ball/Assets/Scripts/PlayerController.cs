@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private int score;
+    private bool flag;
 
     // Start is called before the first frame update
     void Start()
@@ -20,17 +21,38 @@ public class PlayerController : MonoBehaviour
         score = 0;
         SetCountText();
         winText.text = "";
+        flag = false;
+        rb.velocity = new Vector3(0, -5, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        var moveHorizontal = Input.GetAxis("Horizontal");
-        var moveVertical = Input.GetAxis("Vertical");
+        var playerY = getY();
 
-        var movement = new Vector3(moveHorizontal, 0, moveVertical);
+        if (flag)
+        {
+            var moveHorizontal = Input.GetAxis("Horizontal");
+            var moveVertical = Input.GetAxis("Vertical");
 
-        rb.AddForce(movement * speed);
+            var movement = new Vector3(moveHorizontal, 0, moveVertical);
+
+            rb.AddForce(movement * speed);
+        }
+        else
+        {
+            if (playerY <= 1.5)
+            {
+                flag = true;
+            }
+        }
+
+        if (playerY <= -30)
+        {
+            flag = false;
+            this.transform.position = new Vector3(0, 5, 0);
+            rb.velocity = new Vector3(0, -5, 0);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -45,9 +67,19 @@ public class PlayerController : MonoBehaviour
     void SetCountText()
     {
         ScoreText.text = "Count: " + score.ToString();
-        if (score >= 12)
+        if (score >= 16)
         {
             winText.text = "You Win!";
         }
+    }
+
+    float getY()
+    {
+        return this.transform.position.y;
+    }
+
+    public int getScore()
+    {
+        return score;
     }
 }
