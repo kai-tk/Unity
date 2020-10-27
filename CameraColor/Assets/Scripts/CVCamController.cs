@@ -16,8 +16,8 @@
 
         public byte range = 10;
         public byte bws = 25;
-        public byte blackv = 75;
-        public byte whitev = 210;
+        public byte blackv = 50;
+        public byte whites = 25;
         bool flag = false;
 
         Mat mat;
@@ -36,6 +36,7 @@
         Texture2D changedTex;
         bool whiteflag;
         bool blackflag;
+        bool savebwflag;
 
         public bool debugmode=false;
 
@@ -131,12 +132,15 @@
         {
             whiteflag = false;
             blackflag = false;
-            if (ghsv[1]<bws && ghsv[2] > whitev) whiteflag = true;
-            if (ghsv[2] < blackv) blackflag = true;
+            savebwflag = false;
+
+            if (ghsv[2] <= blackv) blackflag = true;
+            else if (ghsv[1] <= whites) whiteflag = true;
+
+            if (shsv[1] <= whites /*|| shsv[2] <= blackv*/ ) savebwflag = true;
 
             changedHsvMat = hsvMat.Clone();
 
-            //Vector3 psv = new Vector3(0, (float)shsv[1] / (ghsv[1] + 1), (float)shsv[2] / (ghsv[2] + 1));
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
@@ -144,22 +148,37 @@
                     Vec3b hsv = hsvMat.At<Vec3b>(i, j);
                     Vec3b bgr = mat.At<Vec3b>(i, j);
 
-                    if ((whiteflag && hsv[1]<bws) || blackflag)
+                    if (whiteflag)
                     {
-                        if (System.Math.Sqrt(System.Math.Pow((gbgr[0] - bgr[0]) * 0.11, 2) + System.Math.Pow((gbgr[1] - bgr[1]) * 0.59, 2) + System.Math.Pow((gbgr[2] - bgr[2]) * 0.30, 2)) < range*3)
+                        if(hsv[1]<=whites && System.Math.Sqrt(System.Math.Pow((gbgr[0] - bgr[0]) * 0.11, 2) + System.Math.Pow((gbgr[1] - bgr[1]) * 0.59, 2) + System.Math.Pow((gbgr[2] - bgr[2]) * 0.30, 2)) < range*2) //hsv[1]<=whites && hsv[2] >= blackv)
                         {
-                            changedHsvMat.Set(i, j, new Vec3b(shsv[0], (byte)((hsv[1] + shsv[1] * 2) / 3), (byte)((hsv[2] + shsv[2] * 2) / 3)));
+                            changedHsvMat.Set(i, j, new Vec3b(shsv[0], (byte)((hsv[1] + shsv[1] * 4) / 5), (byte)((hsv[2] + shsv[2] * 4) / 5)));
                         }
                     }
-                    else if(!whiteflag)
+                    else if (blackflag)
                     {
-                        if ((System.Math.Abs(ghsv[0] - hsv[0]) < range || System.Math.Abs(ghsv[0] - hsv[0]) > 180 - range) /*&& System.Math.Abs(ghsv[1] - hsv[1]) < range*/ && !(hsv[1] < bws && hsv[2] > whitev) && hsv[2]>blackv)
+                        if (System.Math.Sqrt(System.Math.Pow((gbgr[0] - bgr[0]) * 0.11, 2) + System.Math.Pow((gbgr[1] - bgr[1]) * 0.59, 2) + System.Math.Pow((gbgr[2] - bgr[2]) * 0.30, 2)) < range * 3)
                         {
-                            changedHsvMat.Set(i, j, new Vec3b(shsv[0], (byte)((hsv[1] + shsv[1] * 2) / 3), (byte)((hsv[2] + shsv[2] * 2) / 3)));
+                            changedHsvMat.Set(i, j, new Vec3b(shsv[0], (byte)((hsv[1] + shsv[1] * 4) / 5), (byte)((hsv[2] + shsv[2] * 4) / 5)));
+                        }
+                    }
+                    else
+                    {
+                        if ((System.Math.Abs(ghsv[0] - hsv[0]) < range || System.Math.Abs(ghsv[0] - hsv[0]) > 180 - range) && (hsv[1] >= whites && hsv[2] >= blackv))
+                        {
+                            if (savebwflag)
+                            {
+                                changedHsvMat.Set(i, j, new Vec3b(hsv[0], (byte)((hsv[1] + shsv[1] * 4) / 5), (byte)((hsv[2] + shsv[2] * 4) / 5)));
+                            }
+                            else
+                            {
+                                changedHsvMat.Set(i, j, new Vec3b(shsv[0], (byte)((hsv[1] + shsv[1] * 2) / 3), (byte)((hsv[2] + shsv[2] * 2) / 3)));
+                            }
                         }
                     }
                 }
             }
+
             Cv2.CvtColor(changedHsvMat, changedMat, ColorConversionCodes.HSV2BGR);
             changedTex = Unity.MatToTexture(changedMat);
             GetComponent<RawImage>().texture = changedTex;
