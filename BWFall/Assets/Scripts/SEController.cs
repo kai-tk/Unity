@@ -14,7 +14,6 @@ public class SEController : MonoBehaviour
     void Start()
     {
         se = GetComponents<AudioSource>();
-        script = GameController.GetComponent<GameController>();
         if (DontDestroyEnabled)
         {
             DontDestroyOnLoad(this);

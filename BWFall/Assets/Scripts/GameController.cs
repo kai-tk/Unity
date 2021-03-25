@@ -19,9 +19,13 @@ public class GameController : MonoBehaviour
     void Start()
     {
         major = true;
+
+        //Get Object on Layer
         player = LayerMask.NameToLayer("player");
         white = LayerMask.NameToLayer("white");
         black = LayerMask.NameToLayer("black");
+
+        //Change Collision
         Physics2D.IgnoreLayerCollision(player, white);
         Physics2D.IgnoreLayerCollision(player, black, false);
 

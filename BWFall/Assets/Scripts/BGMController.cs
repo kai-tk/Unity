@@ -17,7 +17,7 @@ public class BGMController : MonoBehaviour
         minor = GetComponents<AudioSource>()[1];
         script = GameController.GetComponent<GameController>();
 
-        major.volume = 1;
+        major.volume = 0.3f;
         minor.volume = 0;
     }
 
@@ -27,12 +27,12 @@ public class BGMController : MonoBehaviour
         if (script.getMode())
         {
             major.volume = 0;
-            minor.volume = 1;
+            minor.volume = 0.3f;
         }
         else
         {
             minor.volume = 0;
-            major.volume = 1;
+            major.volume = 0.3f;
         }
     }
 

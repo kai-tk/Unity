@@ -55,8 +55,9 @@ public class BWPlayer : MonoBehaviour
             }
         }
 
-        //make clone
+        //Make Clone
         if (flag) {
+            //Go Right
             if (transform.position.x > 4f)
             {
                 Vector3 pos = transform.position;
@@ -64,7 +65,9 @@ public class BWPlayer : MonoBehaviour
                 GameObject Player = Instantiate(PlayerPrefab, pos, Quaternion.identity);
                 Player.name = PlayerPrefab.name;
                 flag = false;
-            } else if (transform.position.x<-4f)
+            } 
+            //Go Left
+            else if (transform.position.x<-4f)
             {
                 Vector3 pos = transform.position;
                 pos.x += 9f;
@@ -72,13 +75,16 @@ public class BWPlayer : MonoBehaviour
                 Player.name = PlayerPrefab.name;
                 flag = false;
             }
-        }else if(transform.position.x<=4f && transform.position.x >= -4f)
+        }
+        //Can Make Clone
+        else if(transform.position.x<=4f && transform.position.x >= -4f)
         {
             flag = true;
         }
-        if(transform.position.x>5f || transform.position.x<-5f)
+        if (transform.position.x>5f || transform.position.x<-5f)
         {
             this.tag = "destroy";
+            //Change Main Player
             Camera.main.GetComponent<CamController>().changeMainPlayer();
             Destroy(this.gameObject);
         }
