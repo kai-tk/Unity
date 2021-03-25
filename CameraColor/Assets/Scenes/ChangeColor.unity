@@ -860,7 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 390d69ca4bee5384abec43087d998c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 15
+  range: 5
   bws: 25
   blackv: 75
   whites: 25
